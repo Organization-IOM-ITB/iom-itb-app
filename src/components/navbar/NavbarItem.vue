@@ -54,7 +54,7 @@
           <img :src="require('@/assets/image/logo.png')" alt="IOM ITB Logo" class="w-14 xl:w-16 h-auto mr-3">
           <div>
             <p class="text-[14px] xl:text-[18px] font-[700] leading-tight">Ikatan Orang Tua Mahasiswa</p>
-            <p class="text-[14px] xl:text-[16px] font-[600] leading-tight">Institut Teknologi Bandung</p>
+            <p class="text-[14px] xl:text-[16px] font-[600] leading-tight">Mahasiswa ITB</p>
           </div>
         </a>
         <button class="text-main xl:hidden" id="navbarToggle" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
