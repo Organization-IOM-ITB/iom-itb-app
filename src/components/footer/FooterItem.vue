@@ -6,8 +6,8 @@
           <div class="flex items-center mb-4">
             <img :src="require('@/assets/image/logo.png')" alt="IOM-ITB" class="w-[100px] mr-4">
             <div>
-              <p class="text-lg font-bold leading-tight">Ikatan Orang Tua Mahasiswa</p>
-              <p class="text-sm leading-tight">Institut Teknologi Bandung</p>
+              <p class="text-lg font-bold leading-tight">Ikatan Orang Tua</p>
+              <p class="text-sm leading-tight">Mahasiswa ITB</p>
             </div>
           </div>
           <p class="mb-4">
