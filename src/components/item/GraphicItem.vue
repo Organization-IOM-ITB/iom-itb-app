@@ -9,12 +9,12 @@
       </div>
       <div class="w-full md:w-fit h-fit flex">
         <select id="countries" class="bg-gray-50 border border-gray-300 text-gray-900 text-[14px] md:text-[16px] rounded-[5px] focus:ring-blue-500 focus:border-blue-500 block w-full px-[8px] py-[4px]" v-model="graphic">
-          <option v-for="(opt, index) in options" :key="index" :value="index">{{ opt }}</option>
+          <option v-for="(opt, index) in options" :key="index" :value="index">{{ opt.label }}</option>
         </select>
       </div>
     </div>
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 mt-4 overflow-hidden">
-      <img :src="currentImages[graphic] || currentImages[0]" class="w-full md:px-10 md:py-8 object-contain" />
+      <img :src="currentImages[graphic]?.src || ''" class="w-full md:px-10 md:py-8 object-contain" />
     </div>
   </div>
 </template>
@@ -26,32 +26,15 @@ export default {
       data: [
         {
           category: 'report', 
-          options: ['Rekap Penyaluran', 'Jumlah Penerima'],
-          graphic: [
-            require('@/assets/image/penyaluran-bantuan-iom-itb.png'),
-            require('@/assets/image/jumlah-penerima-bantuan-iom-itb.png')
-          ]
+          images: this.loadImages('report')
         },
         {
           category: 'year', 
-          options: ['Rekap Semua', 'Biaya Hidup', 'Tugas Akhir', 'UKT'],
-          graphic: [
-            require('@/assets/image/grafik-penerimaan-bantuan-iom-2025.png'),
-            require('@/assets/image/grafik-rekap-pertahun.png'),
-            require('@/assets/image/grafik-biaya-hidup-pertahun.png'),
-            require('@/assets/image/grafik-tugas-akhir-pertahun.png'),
-            require('@/assets/image/grafik-ukt-pertahun.png')
-          ]
+          images: this.loadImages('year')
         },
         {
           category: 'grade', 
-          options: ['Rekap Semua', 'Biaya Hidup', 'Tugas Akhir', 'UKT'],
-          graphic: [
-            require('@/assets/image/grafik-rekap-perangkatan.png'),
-            require('@/assets/image/grafik-biaya-hidup-perangkatan.png'),
-            require('@/assets/image/grafik-tugas-akhir-perangkatan.png'),
-            require('@/assets/image/grafik-ukt-perangkatan.png')
-          ]
+          images: this.loadImages('grade')
         }
       ],
       graphic: 0,
@@ -63,13 +46,67 @@ export default {
       return this.data.find(d => d.category === this.mode);
     },
     options() {
-      return this.currentCategory ? this.currentCategory.options : [];
+      if (this.currentCategory) {
+        return this.currentCategory.images.map(img => ({
+          label: img.label,
+          src: img.src
+        }));
+      }
+      return [];
     },
     currentImages() {
-      return this.currentCategory ? this.currentCategory.graphic : [];
+      return this.currentCategory ? this.currentCategory.images : [];
     }
   },
   methods: {
+    loadImages(category) {
+      const images = [];
+      
+      // Import all images from assets/image folder
+      const imageContext = require.context('@/assets/image/', false, /\.png$/);
+      
+      imageContext.keys().forEach((key) => {
+        const filename = key.replace('./', '').replace('.png', '');
+        let categoryMatch = '';
+        
+        // Determine which category this image belongs to
+        if (category === 'report' && !filename.includes('pertahun') && !filename.includes('perangkatan')) {
+          categoryMatch = 'report';
+        } else if (category === 'year' && filename.includes('pertahun')) {
+          categoryMatch = 'year';
+        } else if (category === 'grade' && filename.includes('perangkatan')) {
+          categoryMatch = 'grade';
+        }
+        
+        // If this image matches the current category, add it
+        if (categoryMatch === category) {
+          // Extract label from filename
+          // Example: grafik-biaya-hidup-pertahun.png -> Biaya Hidup
+          const label = this.extractLabel(filename, category);
+          
+          images.push({
+            label: label,
+            src: imageContext(key),
+            filename: filename
+          });
+        }
+      });
+      
+      return images;
+    },
+    extractLabel(filename, category) {
+      // Remove category suffix
+      let cleanName = filename.replace('-pertahun', '').replace('-perangkatan', '');
+      
+      // Remove common prefixes
+      cleanName = cleanName.replace('grafik-', '');
+      
+      // Convert kebab-case to Title Case
+      return cleanName
+        .split('-')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+    },
     modeHandler(v) {
       this.mode = v;
       this.graphic = 0; // Reset select when mode changes
@@ -77,6 +114,3 @@ export default {
   }
 };
 </script>
-  
-
-  
